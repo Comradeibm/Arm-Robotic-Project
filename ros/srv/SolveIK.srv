@@ -1,0 +1,15 @@
+# SolveIK.srv
+# Request: target end-effector XYZ (and an optional seed configuration
+#          to bias which IK solution/elbow orientation is returned).
+# Response: solved joint angles (radians) and whether IK converged.
+#
+# Referenced by ros/scripts/ik_service_node.py. Place this file in your
+# catkin package's srv/ folder and add it to CMakeLists.txt / package.xml
+# (add_service_files + generate_messages) so catkin generates the
+# SolveIK / SolveIKResponse Python classes that node imports.
+
+geometry_msgs/Point target_xyz
+float64[] seed_joint_angles
+---
+float64[] joint_angles
+bool success

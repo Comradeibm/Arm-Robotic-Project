@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+  arm_sim.launch
+  ===============
+  Brings up the full simulation stack for Project 1:
+    - Loads the URDF onto the parameter server
+    - Starts Gazebo with the arm spawned in it (physics simulation)
+    - Starts joint_state_publisher + robot_state_publisher (for RViz/TF)
+    - Loads the joint_trajectory_controller so trajectory_publisher_node.py
+      can stream the planned motion to the (simulated) robot
+    - Opens RViz with a preconfigured view
+
+  Usage (from a catkin workspace with this package built/sourced):
+    roslaunch six_dof_arm_description arm_sim.launch
+    roslaunch six_dof_arm_description arm_sim.launch gui:=false   # headless Gazebo
+-->
+<launch>
+  <arg name="gui" default="true"/>
+  <arg name="rvizconfig" default="$(find six_dof_arm_description)/rviz/arm.rviz"/>
+
+  <param name="robot_description"
+         command="$(find xacro)/xacro '$(find six_dof_arm_description)/urdf/six_dof_arm.urdf'"/>
+
+  <!-- Gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+  </include>
+
+  <node name="spawn_arm" pkg="gazebo_ros" type="spawn_model"
+        args="-urdf -param robot_description -model six_dof_arm -z 0.01"
+        output="screen"/>
+
+  <!-- Controllers (position-based joint_trajectory_controller) -->
+  <rosparam file="$(find six_dof_arm_description)/config/arm_controllers.yaml"
+            command="load"/>
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        args="joint_state_controller arm_trajectory_controller" output="screen"/>
+
+  <!-- State publishing for TF / RViz -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+        type="robot_state_publisher" output="screen"/>
+
+  <!-- RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)"
+        output="screen" required="false"/>
+</launch>

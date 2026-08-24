@@ -1,0 +1,34 @@
+# arm_controllers.yaml
+# Loaded by arm_sim.launch. Defines:
+#   - joint_state_controller: publishes /joint_states for RViz/TF
+#   - arm_trajectory_controller: a position_controllers/JointTrajectoryController
+#     that accepts FollowJointTrajectory goals (what trajectory_publisher_node.py
+#     sends) and interpolates between the CSV points at the controller's
+#     own rate, executing the pre-planned smooth motion on the simulated
+#     (Gazebo) or real robot.
+
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+arm_trajectory_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+    - joint5
+    - joint6
+  constraints:
+    goal_time: 0.5
+    stopped_velocity_tolerance: 0.05
+    joint1: {trajectory: 0.1, goal: 0.05}
+    joint2: {trajectory: 0.1, goal: 0.05}
+    joint3: {trajectory: 0.1, goal: 0.05}
+    joint4: {trajectory: 0.1, goal: 0.05}
+    joint5: {trajectory: 0.1, goal: 0.05}
+    joint6: {trajectory: 0.1, goal: 0.05}
+  stop_trajectory_duration: 0.5
+  state_publish_rate: 50
+  action_monitor_rate: 20
